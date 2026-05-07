@@ -128,10 +128,10 @@ async function multipleAccountButton() {
   } else {
     country_name = "international";
   }
-  return `<a href="<a href="https://cyberwhatsapppro.com/multiple-account/?numAccounts=10" target="_blank" class="popup-btn pricing-purple-btn CtaBtn">
+  return `<a href="https://cybergh.netlify.app/multiple-account/?numAccounts=10" target="_blank" class="popup-btn pricing-purple-btn CtaBtn">
         <span style="white-space:nowrap;">Buy multiple users<br/></span>
         <span style="white-space:nowrap; color: #fff; font-size: 14px; line-height: 16px;font-weight:bold;display:flex;"><span style="margin-right:3px;">@</span>
-            ${country_name === "india" ? '<span class="rupee">â‚¹</span>' : ""}
+            ${country_name === "india" ? '<span class="rupee">₹</span>' : ""}
             <span class="price_class">${MULT25ACCOUNTPRICE[country_name]
     }</span>/month
         </span>
@@ -168,7 +168,7 @@ async function basicButton(
   return `<a href="${pricing_link}" target="_blank" class="popup-btn pricing-white-btn CtaBtn" style="font-weight:bold;font-size:14px;">
         Buy Basic<br/>
         <span style="white-space:nowrap; color: #009a88; font-size: 14px; line-height: 16px;font-weight:bold;display:flex;"><span style="margin-right:3px;">@</span> 
-            ${country_name === "india" ? '<span class="rupee">â‚¹</span>' : ""}
+            ${country_name === "india" ? '<span class="rupee">₹</span>' : ""}
             <span class="price_class">${basicPrice}</span>/month
         </span>
         ${country_name === "international" && country_currency != "USD"
@@ -211,7 +211,7 @@ async function advanceButton(
     popup_name == "advance_promo_reminder" ||
     popup_name == "advance_promo_expired"
   ) {
-    pricing_link = "https://cyberwhatsapppro.com/pricing";
+    pricing_link = "https://cybergh.netlify.app/pricing";
   }
 
   return `<a href="${pricing_link}" target="_blank" class="popup-btn pricing-green-btn CtaBtn" style="font-weight:bold;font-size:14px;">
@@ -219,7 +219,7 @@ async function advanceButton(
         ${showPrice
       ? `<br/>
             <span style="white-space:nowrap; font-size: 14px; line-height: 16px;font-weight:bold;display:flex;"><span style="margin-right:3px;">@</span>
-                ${country_name === "india" ? '<span class="rupee">â‚¹</span>' : ""
+                ${country_name === "india" ? '<span class="rupee">₹</span>' : ""
       }
                 <span class="price_class">${advancePrice}</span>/month
             </span>
@@ -2188,7 +2188,7 @@ function getMessage() {
               );
               if (days_since_purchased <= 7 && result.customer_email) {
                 chrome.tabs.create({
-                  url: "https://cyberwhatsapppro.com/login?transfer=true",
+                  url: "https://cybergh.netlify.app/login?transfer=true",
                 });
               } else if (premiumCountrySelectorContainer) {
                 premiumCountrySelectorContainer.classList.toggle("hide");
@@ -2721,7 +2721,7 @@ function getMessage() {
   });
   $("#buy_premium_popup").click(function () {
     trackButtonClick("buy_premium_popup");
-    window.open("https://cyberwhatsapppro.com/pricing/", "_blank");
+    window.open("https://cybergh.netlify.app/pricing/", "_blank");
   });
   $("#learn_schedule").click(function () {
     sendMessageToBackground({ type: "learn_schedule" });
@@ -5520,11 +5520,11 @@ function changeInputPercentage() {
     if (Object.keys(COUNTRY_WITH_SPECIFIC_PRICING).includes(country_code))
       country_name = COUNTRY_WITH_SPECIFIC_PRICING[country_code];
     else country_name = "international";
-    let pricingButtonLink = "https://cyberwhatsapppro.com/pricing";
+    let pricingButtonLink = "https://cybergh.netlify.app/pricing";
     if (last_plan_type == "Basic") {
-      pricingButtonLink = `https://cyberwhatsapppro.com/pricing/?country=${country_name}&lastPlan=lastPlan&currentPlan=basic`;
+      pricingButtonLink = `https://cybergh.netlify.app/pricing/?country=${country_name}&lastPlan=lastPlan&currentPlan=basic`;
     } else if (last_plan_type == "Advance") {
-      pricingButtonLink = `https://cyberwhatsapppro.com/pricing/?country=${country_name}&lastPlan=lastPlan&currentPlan=advance`;
+      pricingButtonLink = `https://cybergh.netlify.app/pricing/?country=${country_name}&lastPlan=lastPlan&currentPlan=advance`;
     }
 
     // message part
@@ -5677,7 +5677,7 @@ function showFaqsSection() {
 }
 
 function getFreeTrialButtonHtml() {
-  let pricing_link = `https://cyberwhatsapppro.com/pricing?country=${country_name}&plan=`;
+  let pricing_link = `https://cybergh.netlify.app/pricing?country=${country_name}&plan=`;
   let freeTrialButtonHtml = `<a href="${pricing_link}" target="_blank" class="popup-btn pricing-green-btn CtaBtn" style="font-weight:bold;font-size:14px;">
             Buy Premium
         </a>`;
@@ -5748,7 +5748,7 @@ async function showBuyPremiumButtons() {
     country_name = "international";
   }
 
-  let pricing_link = `https://cyberwhatsapppro.com/checkout/?country=${country_name}&phone=${my_number}&plan=`;
+  let pricing_link = `https://cybergh.netlify.app/checkout/?country=${country_name}&phone=${my_number}&plan=`;
 
   let advancePrice = pricing_data.advance_price[country_name];
   let basicPrice = pricing_data.basic_price[country_name];
@@ -5782,11 +5782,11 @@ async function showBuyPremiumButtons() {
       premium_buttons_html += advanceButtonHtml;
     }
     premium_buttons_html += `<br /> <div style="width:100%;display:flex;justify-content:flex-start;align-items:center;margin-left:-16px;">
-                <a href="https://cyberwhatsapppro.com/multiple-account?country=${country_name}" target="_blank" style="color:#009a88;font-size:14px;text-decoration:underline;font-weight:bold;">Purchase for multiple users</a>
+                <a href="https://cybergh.netlify.app/multiple-account?country=${country_name}" target="_blank" style="color:#009a88;font-size:14px;text-decoration:underline;font-weight:bold;">Purchase for multiple users</a>
             </div>`;
   } else {
     premium_buttons_html = `<div style="width:100%;display:flex;justify-content:flex-start;align-items:center;margin-left:-16px;">
-                <a href="https://cyberwhatsapppro.com/multiple-account?country=${country_name}" target="_blank" style="color:#009a88;font-size:14px;text-decoration:underline;font-weight:bold;">Purchase for multiple users</a>
+                <a href="https://cybergh.netlify.app/multiple-account?country=${country_name}" target="_blank" style="color:#009a88;font-size:14px;text-decoration:underline;font-weight:bold;">Purchase for multiple users</a>
             </div>`;
   }
 

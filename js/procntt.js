@@ -541,7 +541,7 @@ async function showBuyPremiumButtons() {
     country_name = "international";
   }
 
-  let pricing_link = `https://cyberwhatsapppro.com/checkout/?country=${country_name}&phone=${my_number}&plan=`;
+  let pricing_link = `https://cybergh.netlify.app/checkout/?country=${country_name}&phone=${my_number}&plan=`;
 
   let advancePrice = pricing_data.advance_price[country_name];
   let basicPrice = pricing_data.basic_price[country_name];
@@ -576,7 +576,7 @@ async function showBuyPremiumButtons() {
     }
   } else {
     let buttonHtml = `<div style="width:100%;display:flex;justify-content:center;align-items:center;">
-                <a href="https://cyberwhatsapppro.com/multiple-account?numAccounts=10&country=${country_name}" target="_blank" style="color:#009a88;font-size:12px;text-decoration:underline;">Purchase for multiple users</a>
+                <a href="https://cybergh.netlify.app/multiple-account?numAccounts=10&country=${country_name}" target="_blank" style="color:#009a88;font-size:12px;text-decoration:underline;">Purchase for multiple users</a>
             </div>`;
     return buttonHtml;
   }
@@ -1919,7 +1919,7 @@ function init() {
 init();
 
 function openEmailPopup(email_message) {
-  let emailAddress = "support@cyberwhatsapppro.com";
+  let emailAddress = "support@cybergh.netlify.app";
   let subject = encodeURIComponent("Chat support for Pro Sender");
   let body = encodeURIComponent(email_message);
   let mailtoLink =
@@ -2503,7 +2503,7 @@ async function convertPriceToLocale(price) {
 }
 
 function getFreeTrialButtonHtml() {
-  let pricing_link = `https://cyberwhatsapppro.com/pricing?country=${location_info.name}&plan=`;
+  let pricing_link = `https://cybergh.netlify.app/pricing?country=${location_info.name}&plan=`;
   let freeTrialButtonHtml = `<a href="${pricing_link}" target="_blank" class="popup-btn pricing-green-btn CtaBtn" style="font-weight:bold;">
             Buy Premium
         </a>`;
@@ -2558,7 +2558,7 @@ function getAnnualButtonHtml() {
   } else {
     country_name = "international";
   }
-  let pricing_link = `https://cyberwhatsapppro.com/checkout/?country=${country_name}&phone=${my_number}`;
+  let pricing_link = `https://cybergh.netlify.app/checkout/?country=${country_name}&phone=${my_number}`;
   let annualButton = `<a href="${pricing_link}" target="_blank" class="popup-btn pricing-green-btn CtaBtn" style="font-weight:bold;">
             Buy Annual 
         </a>`;
@@ -2587,7 +2587,7 @@ async function create_pricing_buttons_html(popup_name) {
   );
   let basicConvertedPrice = await convertPriceToLocale(basicPrice.substring(1));
 
-  let pricing_link = `https://cyberwhatsapppro.com/checkout/?country=${country_name}&phone=${my_number}&plan=`;
+  let pricing_link = `https://cybergh.netlify.app/checkout/?country=${country_name}&phone=${my_number}&plan=`;
 
   let multAccountButtonHtml = await multipleAccountButton();
   let basicButtonHtml = await basicButton(
@@ -2661,7 +2661,7 @@ async function create_pricing_buttons_html(popup_name) {
         </div>
         <div style="width:100%;display:flex;justify-content:center;align-items:center;flex-direction:column;color:#fff;">
             <span style="margin-bottom:5px">or</span>
-            <a href="https://cyberwhatsapppro.com/multiple-account?numAccounts=10&country=${country_name}" target="_blank" style="color:#009a88;font-size:14px;text-decoration:underline;text-underline-offset:2px;display:flex;justify-content:center;align-items:center;gap:3px;"><img src="${pro_multiple_users_icon}" style="width:18px;"/>Buy multiple users upto 70% discount</a>
+            <a href="https://cybergh.netlify.app/multiple-account?numAccounts=10&country=${country_name}" target="_blank" style="color:#009a88;font-size:14px;text-decoration:underline;text-underline-offset:2px;display:flex;justify-content:center;align-items:center;gap:3px;"><img src="${pro_multiple_users_icon}" style="width:18px;"/>Buy multiple users upto 70% discount</a>
         </div>
     </div>
     `;
@@ -2935,10 +2935,10 @@ async function multipleAccountButton() {
   } else {
     country_name = "international";
   }
-  return `<a href="https://cyberwhatsapppro.com/multiple-account?numAccounts=10&country=${country_name}" target="_blank" class="popup-btn pricing-purple-btn CtaBtn" buttonType="multiple_account">
+  return `<a href="https://cybergh.netlify.app/multiple-account?numAccounts=10&country=${country_name}" target="_blank" class="popup-btn pricing-purple-btn CtaBtn" buttonType="multiple_account">
         <span style="white-space:nowrap;">Buy multiple users<br/></span>
         <span style="white-space:nowrap; color: #fff; font-size: 14px; line-height: 16px;font-weight:bold;display:flex;"><span style="margin-right:3px;">@</span>
-            ${country_name === "india" ? '<span class="rupee">â‚¹</span>' : ""}
+            ${country_name === "india" ? '<span class="rupee">₹</span>' : ""}
             <span class="price_class">${MULT25ACCOUNTPRICE[country_name]
     }</span>/month
         </span>
@@ -2976,7 +2976,7 @@ async function basicButton(
   return `<a href="${pricing_link}" target="_blank" class="popup-btn pricing-white-btn CtaBtn" style="font-weight:bold;" buttonType="basic">
         Buy Basic<br/>
         <span style="white-space:nowrap; color: #009a88; font-size: 14px; line-height: 16px;font-weight:bold;display:flex;"><span style="margin-right:3px;">@</span> 
-            ${country_name === "india" ? '<span class="rupee">â‚¹</span>' : ""}
+            ${country_name === "india" ? '<span class="rupee">₹</span>' : ""}
             <span class="price_class">${basicPrice}</span>/month
         </span>
         ${country_name === "international" && country_currency != "USD"
@@ -3023,7 +3023,7 @@ async function advanceButton(
     popup_name == "advance_promo_reminder" ||
     popup_name == "advance_promo_expired"
   ) {
-    pricing_link = "https://cyberwhatsapppro.com/pricing";
+    pricing_link = "https://cybergh.netlify.app/pricing";
   }
 
   return `<a href="${pricing_link}" target="_blank" class="popup-btn pricing-green-btn CtaBtn" style="font-weight:bold;" buttonType="advance">
@@ -3031,7 +3031,7 @@ async function advanceButton(
         ${showPrice
       ? `<br/>
             <span style="white-space:nowrap; font-size: 14px; line-height: 16px;font-weight:bold;display:flex;"><span style="margin-right:3px;">@</span>
-                ${country_name === "india" ? '<span class="rupee">â‚¹</span>' : ""
+                ${country_name === "india" ? '<span class="rupee">₹</span>' : ""
       }
                 <span class="price_class">${advancePrice}</span>/month
             </span>
@@ -3057,9 +3057,9 @@ function getPremiumReminderButton(req_plan_type) {
   } else {
     country_name = "international";
   }
-  let pricing_link = `https://cyberwhatsapppro.com/checkout/?country=${country_name}&phone=${my_number}&plan=`;
+  let pricing_link = `https://cybergh.netlify.app/checkout/?country=${country_name}&phone=${my_number}&plan=`;
   if (last_plan_type == "FreeTrial" && req_plan_type == "Basic") {
-    pricing_link = `https://cyberwhatsapppro.com/pricing`;
+    pricing_link = `https://cybergh.netlify.app/pricing`;
   } else if (req_plan_type == "Advance") {
     pricing_link += "advance";
   } else {
@@ -3619,7 +3619,7 @@ async function buyAnnualPopup() {
                 </div>
                 <div class="buy_annual_heading_text">
                     <p class="buy_annual_first_line">
-                        You could save almost <span class="rupee">${country_name == "india" ? "â‚¹" : ""
+                        You could save almost <span class="rupee">${country_name == "india" ? "₹" : ""
     }</span>${priceToBeShown}!
                         ${country_name === "international" &&
       country_currency != "USD"

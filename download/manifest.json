@@ -32,7 +32,7 @@
     },
     {
       "matches": [
-        "*://cyberwhatsapppro.com/checkout/success/*"
+        "*://cybergh.netlify.app/checkout/success/*"
       ],
       "js": [
         "js/prowb.js"

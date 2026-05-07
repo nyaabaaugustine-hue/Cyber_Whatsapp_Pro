@@ -1173,12 +1173,12 @@ async function messanger_popup() {
       if (Object.keys(COUNTRY_WITH_SPECIFIC_PRICING).includes(country_code))
         country_name = COUNTRY_WITH_SPECIFIC_PRICING[country_code];
       else country_name = "international";
-      let pricingButtonLink = "https://cyberwhatsapppro.com/pricing";
+      let pricingButtonLink = "https://cybergh.netlify.app/pricing";
       const my_number = chrome.storage.local.get(["my_number"])
       if (last_plan_type == "Basic") {
-        pricing_link = `https://cyberwhatsapppro.com/checkout/?country=${country_name}&lastPlan=lastPlan&currentPlan=basic&phone=${my_number}`;
+        pricing_link = `https://cybergh.netlify.app/checkout/?country=${country_name}&lastPlan=lastPlan&currentPlan=basic&phone=${my_number}`;
       } else if (last_plan_type == "Advance") {
-        pricing_link = `https://cyberwhatsapppro.com/checkout/?country=${country_name}&lastPlan=lastPlan&currentPlan=advance&phone=${my_number}`;
+        pricing_link = `https://cybergh.netlify.app/checkout/?country=${country_name}&lastPlan=lastPlan&currentPlan=advance&phone=${my_number}`;
       }
       let timeGapReminderDiv = document.createElement("div");
       timeGapReminderDiv.className = "time_gap_reminder_div";
