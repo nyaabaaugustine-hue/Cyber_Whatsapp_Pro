@@ -930,6 +930,4 @@ const PRICING_PAGE_LINK = {
 POPUP_DATA         = {};
 PRICING_DATA       = {};
 
-// Plan state — force everything to Advance/unlocked
-var plan_type      = "Advance";
-var last_plan_type = "Advance";
+// Plan state is set per-script (procntt.js / propup.js) — do NOT declare here to avoid let re-declaration errors

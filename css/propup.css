@@ -1,4 +1,30 @@
-﻿body {
+﻿/* ===== NUCLEAR PRICE BLOCK SUPPRESSION — DO NOT REMOVE ===== */
+#select_premium_container, .premium-tab,
+#show_premium_features,
+#buy_premium_block, .buy_premium_block, #buy_premium_popup, .premium_button,
+.invoice_feature_block, #invoice_input, #download_invoice_button,
+.time_gap_reminder_div, .free_trial_reminder,
+.trial_popup, .trial_content,
+.buy_annual_popup, .buy_annual_popup_content,
+.pricing-buttons-container, .pricing-green-btn, .pricing-white-btn, .pricing-purple-btn,
+a[buttonType], .buy-annual-popup-btn,
+.premium_features_divider, .premium-pie-section, .pie-container,
+.mult_account_block, .what_is_advancepromo_block,
+#transfer_premium_button, #premium_country_selector_container,
+#premium_enabled_on, #plan_details, #customer_email, #premium_utilisation_text,
+.paused_campaign_strip,
+[id$="_popup"][id*="trial"], [id$="_popup"][id*="premium"],
+[id$="_popup"][id*="promo"], [id$="_popup"][id*="expired"],
+.messages_remaining_count_div {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+/* ===== END SUPPRESSION ===== */
+
+body {
     margin: 0px;
     width: 772px;
     font-family: 'PT Sans Caption' !important;

@@ -96,7 +96,9 @@ $(function () {
   init();
 });
 
-async function convertPriceToLocale(price) {
+/* === PRICE BLOCK SUPPRESSION: all pricing/buy/trial/popup functions neutered === */
+async function convertPriceToLocale(price) { return ''; }
+async function _convertPriceToLocale_ORIG(price) {
   const exchangeRateAPI =
     "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json";
   const res = await fetch(exchangeRateAPI);
@@ -117,7 +119,8 @@ async function convertPriceToLocale(price) {
   return convertedPrice;
 }
 
-async function multipleAccountButton() {
+async function multipleAccountButton() { return ''; }
+async function _multipleAccountButton_ORIG() {
   let {
     name: country_name,
     name_code: country_code,
@@ -146,7 +149,8 @@ async function multipleAccountButton() {
     </a>`;
 }
 
-async function basicButton(
+async function basicButton() { return ''; }
+async function _basicButton_ORIG(
   pricing_link = "",
   basicPrice = "",
   basicConvertedPrice = ""
@@ -180,7 +184,8 @@ async function basicButton(
     </a>`;
 }
 
-async function advanceButton(
+async function advanceButton() { return ''; }
+async function _advanceButton_ORIG(
   pricing_link = "",
   advancePrice = "",
   advanceConvertedPrice = "",
