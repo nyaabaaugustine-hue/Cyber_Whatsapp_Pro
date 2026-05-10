@@ -2195,10 +2195,10 @@ function checkAndShowBanner() {
         const bannerHtml = `
           <div id="pros-global-banner" class="pros-global-banner">
             <div class="banner-content">
-              <span class="banner-icon">â„¹ï¸</span>
+              <span class="banner-icon">ℹ️</span>
               <span class="banner-text">${res.bannerText}</span>
             </div>
-            <button class="banner-close" id="pros-banner-close">âœ•</button>
+            <button class="banner-close" id="pros-banner-close">✕</button>
           </div>
         `;
         $("body").prepend(bannerHtml);
@@ -3313,7 +3313,7 @@ const howToUseData = [
   {
     image: pro_how_to_use1,
     content:
-      "Click on the â€˜Extensionsâ€™ icons at the top right of the chrome window",
+      "Click on the ‘Extensions’ icons at the top right of the chrome window",
     index: 1,
     hasPrev: false,
     hasNext: true,
@@ -3632,7 +3632,7 @@ async function buyAnnualPopup() {
             <div class="buy_annual_advice">
                 <div class="buy_annual_advice_text">
                     <img  style="width:25px; height:25px;" src=${pro_cross_icon_src} alt="" />
-                    <p>Youâ€™ve been using the monthly plan which is overall <span style="font-weight:bold;">expensive!</span></p>
+                    <p>You’ve been using the monthly plan which is overall <span style="font-weight:bold;">expensive!</span></p>
                 </div>
                 <div class="buy_annual_advice_text">
                     <img  style="width:25px; height:25px;" src=${pro_check_icon_src} alt="" />
@@ -3947,8 +3947,8 @@ function detectBanText() {
     "you will need to verify your phone number",
     "You have been logged out. To log back in, you will need to verify your phone number.", // English
     "à¤†à¤ª à¤²à¥‰à¤— à¤†à¤‰à¤Ÿ à¤¹à¥‹ à¤—à¤ à¤¹à¥ˆà¤‚à¥¤ à¤«à¤¿à¤° à¤¸à¥‡ à¤²à¥‰à¤— à¤‡à¤¨ à¤•à¤°à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤, à¤†à¤ªà¤•à¥‹ à¤…à¤ªà¤¨à¤¾ à¤«à¤¼à¥‹à¤¨ à¤¨à¤‚à¤¬à¤° à¤¸à¤¤à¥à¤¯à¤¾à¤ªà¤¿à¤¤ à¤•à¤°à¤¨à¤¾ à¤¹à¥‹à¤—à¤¾à¥¤", // Hindi
-    "VocÃª foi desconectado. Para fazer login novamente, serÃ¡ necessÃ¡rio verificar seu nÃºmero de telefone.", // Brazilian Portuguese
-    "Has cerrado sesiÃ³n. Para volver a iniciar sesiÃ³n, deberÃ¡s verificar tu nÃºmero de telÃ©fono.", // Spanish
+    "VocÃª foi desconectado. Para fazer login novamente, será necessário verificar seu número de telefone.", // Brazilian Portuguese
+    "Has cerrado sesión. Para volver a iniciar sesión, deberás verificar tu número de teléfono.", // Spanish
   ];
 
   for (const message of banMessages) {

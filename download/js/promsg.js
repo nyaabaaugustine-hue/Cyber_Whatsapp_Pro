@@ -643,23 +643,38 @@ async function sendMessageToNumber(number, message) {
   try {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        let send_message_btn = getDocumentElement("send_message_btn");
-
-        if (send_message_btn) {
-          send_message_btn.click();
-
-          trackSuccess("send_message_to_number_success");
-          resolve({
-            is_message_sent: "YES",
-            comments: "",
-          });
-        } else {
-          resolve({
-            is_message_sent: "NO",
-            comments: "Issue with the number",
-            error: "Send button is not found",
-          });
+        // If message provided and the input box is empty, paste it in
+        if (message) {
+          try {
+            const inputBox = getDocumentElement("input_message_div");
+            const inputEmpty = !inputBox || !inputBox.textContent.trim();
+            if (inputBox && inputEmpty) {
+              pasteMessage(message);
+            }
+          } catch (pasteErr) {
+            console.warn("WARN :: sendMessageToNumber :: paste fallback failed:", pasteErr);
+          }
         }
+
+        // Wait for the paste to register and the send button to activate
+        setTimeout(() => {
+          let send_message_btn = getDocumentElement("send_message_btn");
+
+          if (send_message_btn) {
+            send_message_btn.click();
+            trackSuccess("send_message_to_number_success");
+            resolve({
+              is_message_sent: "YES",
+              comments: "",
+            });
+          } else {
+            resolve({
+              is_message_sent: "NO",
+              comments: "Issue with the number",
+              error: "Send button is not found",
+            });
+          }
+        }, 500);
       }, 1000);
     });
   } catch (e) {
@@ -930,7 +945,7 @@ async function openNumber(number, message = "", time_gap = 1) {
 
 async function openNumberTab(number, message) {
   const encodedMessage = message ? encodeURIComponent(message) : "";
-  const link = `https://api.whatsapp.com/send?phone=${number}${encodedMessage ? `&text=${encodedMessage}` : ""
+  const link = `https://web.whatsapp.com/send?phone=${number}${encodedMessage ? `&text=${encodedMessage}` : ""
     }`;
 
   let linkElement = document.getElementById("whatsapp-message-sender");
