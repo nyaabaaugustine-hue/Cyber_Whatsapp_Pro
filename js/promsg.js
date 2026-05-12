@@ -700,10 +700,23 @@ async function sendMessageToNumberNew(number, message) {
     }
 
     return new Promise((resolve, reject) => {
-      resolveSendMessageToNumber = resolve;
-      rejectSendMessageToNumber = async (payload) => {
+      // Timeout: if PROS store doesn't respond in 6s, fall back to DOM method
+      const timeoutId = setTimeout(async () => {
+        console.warn("WARN :: sendMessageToNumberNew :: PROS store timeout — falling back to DOM method");
+        resolveSendMessageToNumber = () => {};
+        rejectSendMessageToNumber  = () => {};
         pasteMessage(message);
-        resolve(await sendMessageToNumber());
+        resolve(await sendMessageToNumber(number, message));
+      }, 6000);
+
+      resolveSendMessageToNumber = (result) => {
+        clearTimeout(timeoutId);
+        resolve(result);
+      };
+      rejectSendMessageToNumber = async (payload) => {
+        clearTimeout(timeoutId);
+        pasteMessage(message);
+        resolve(await sendMessageToNumber(number, message));
       };
 
       window.dispatchEvent(

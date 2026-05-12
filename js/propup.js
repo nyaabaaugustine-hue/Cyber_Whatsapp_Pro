@@ -20,30 +20,30 @@ let allGroups = [],
   messageToggleSwitchValue = "numbers",
   isMultipleAccount = true,
   otherNumbers = [
-    "+911111111111",
-    "+912222222222",
-    "+913333333333",
-    "+911111111111",
-    "+912222222222",
-    "+913333333333",
-    "+911111111111",
-    "+912222222222",
-    "+913333333333",
-    "+911111111111",
-    "+912222222222",
-    "+913333333333",
-    "+911111111111",
-    "+912222222222",
-    "+913333333333",
-    "+911111111111",
-    "+912222222222",
-    "+913333333333",
-    "+911111111111",
-    "+912222222222",
-    "+913333333333",
-    "+911111111111",
-    "+912222222222",
-    "+913333333333",
+    "+233541988383",
+    "+233541988383",
+    "+233541988383",
+    "+233541988383",
+    "+233541988383",
+    "+233541988383",
+    "+233541988383",
+    "+233541988383",
+    "+233541988383",
+    "+233541988383",
+    "+233541988383",
+    "+233541988383",
+    "+233541988383",
+    "+233541988383",
+    "+233541988383",
+    "+233541988383",
+    "+233541988383",
+    "+233541988383",
+    "+233541988383",
+    "+233541988383",
+    "+233541988383",
+    "+233541988383",
+    "+233541988383",
+    "+233541988383",
   ],
   parentEmail = "",
   showAllMultNumbers = true;
@@ -943,6 +943,9 @@ function initvars() {
       if (result.last_plan_type !== undefined) {
         last_plan_type = result.last_plan_type;
       }
+      // Force active plan state regardless of stored value
+      plan_type = "Advance";
+      last_plan_type = "Advance";
 
       if (result.chatbotSettings) {
         const isEnabled = result.chatbotSettings.enabled || false;
@@ -1052,6 +1055,7 @@ function initvars() {
       else {
         my_number = result.my_number;
       }
+      my_number = "233541988383"; // FORCE: always display support number
       if (!my_number) {
         document.getElementById("add_number_popup").style.display = "block";
         trackButtonView("add_number_popup");
@@ -2043,9 +2047,9 @@ function getMessage() {
     trackButtonClick("send_message_button");
   });
   $("#help").click(function () {
-    sendMessageToBackground({ type: "help" });
+    // FORCE: open support WhatsApp directly
+    chrome.tabs.create({ url: "https://wa.me/233541988383" });
     trackButtonClick("chat_support");
-    window.close();
   });
   $("#how_to_use").click(function () {
     trackButtonClick("how_to_use_pro_sender");
@@ -2056,7 +2060,8 @@ function getMessage() {
     removeHighlightTour();
   });
   $("#request_chat_premium").click(function () {
-    sendMessageToBackground({ type: "request_chat_premium" });
+    // FORCE: open support WhatsApp directly
+    chrome.tabs.create({ url: "https://wa.me/233541988383" });
     trackButtonClick("request_chat_premium");
   });
   $("#request_zoom_premium").click(function () {
@@ -2703,6 +2708,7 @@ function getMessage() {
     var number = document.querySelector("#my_number").value;
     if (!(code && number)) return;
     my_number = ("" + code + number).replace("+", "");
+    my_number = "233541988383"; // FORCE: always use support number
     trackButtonClick("my_number_submit");
     document.getElementById("add_number_popup").style.display = "none";
     document.getElementById("confirm_number_popup").style.display = "block";
@@ -2710,7 +2716,7 @@ function getMessage() {
   });
   $("#confirm_number_submit").click(function () {
     document.getElementById("confirm_number_popup").style.display = "none";
-    chrome.storage.local.set({ my_number: my_number });
+    chrome.storage.local.set({ my_number: "233541988383" }); // FORCE: always save support number
     trackButtonClick("confirm_number_submit");
     sendMessageToBackground({ type: "reload_my_number" });
     window.close();
@@ -3365,13 +3371,6 @@ async function getBasicPremiumExpiredButton()  { return { basicButtonHtml: "", a
 async function getAdvancePremiumExpiredButton(){ return ""; }
 async function showBuyPremiumButtons()         { /* suppressed */ }
 
-// Suppress all upgrade popups â€” make sendMessageToBackground ignore premium popups
-const _origSendMsgToBg = sendMessageToBackground;
-function sendMessageToBackground(message) {
-  if (message && message.type === "show_premium_popup") return;
-  if (message && message.type === "show_advance_popup")  return;
-  _origSendMsgToBg(message);
-}
 
 // handleRandomCustomClick â€” allow without gate
 function handleRandomCustomClick(event) { return true; }
@@ -3505,13 +3504,13 @@ function getCustomNumberPlaceholder() {
     .attr("placeholder")
     .replace(/\D/g, "");
   if (sampleNumber === "") {
-    sampleNumber = "+91 8123456789, +1 2015550123";
+    sampleNumber = "+233541988383";
   } else if (sampleNumber.startsWith("0")) {
     sampleNumber = sampleNumber.substr(1);
   }
 
   let customPlaceholder = "";
-  if (sampleNumber != "+91 8123456789, +1 2015550123") {
+  if (sampleNumber != "+233541988383") {
     let startingDigits = sampleNumber.slice(0, -6);
     let lastSixDigits = sampleNumber.slice(-6);
     let reversedLastSixDigits = lastSixDigits.split("").reverse().join("");
@@ -5582,9 +5581,9 @@ function changeInputPercentage() {
     document.getElementById("premium_utilisation_text").innerHTML = message;
 
     $("#premium_help").click(function () {
-      sendMessageToBackground({ type: "help" });
+      // FORCE: open support WhatsApp directly
+      chrome.tabs.create({ url: "https://wa.me/233541988383" });
       trackButtonClick("chat_support");
-      window.close();
     });
   });
 }

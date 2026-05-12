@@ -1188,15 +1188,34 @@ async function sendSuggestionMessage(message) {
 }
 
 function pasteMessage(text) {
-  const dataTransfer = new DataTransfer();
-  dataTransfer.setData("text", text);
-  const event = new ClipboardEvent("paste", {
-    clipboardData: dataTransfer,
-    bubbles: true,
-  });
-
   const inputMessageBox = getDocumentElement("input_message_div");
-  inputMessageBox.dispatchEvent(event);
+  if (!inputMessageBox) return;
+
+  inputMessageBox.focus();
+
+  // Method 1: execCommand insertText — most reliable for React-based apps (WhatsApp Web)
+  try {
+    const inserted = document.execCommand('insertText', false, text);
+    if (inserted && inputMessageBox.textContent.trim()) return;
+  } catch (e) { /* fall through */ }
+
+  // Method 2: ClipboardEvent paste — standard fallback
+  try {
+    const dataTransfer = new DataTransfer();
+    dataTransfer.setData("text", text);
+    const event = new ClipboardEvent("paste", {
+      clipboardData: dataTransfer,
+      bubbles: true,
+    });
+    inputMessageBox.dispatchEvent(event);
+    if (inputMessageBox.textContent.trim()) return;
+  } catch (e) { /* fall through */ }
+
+  // Method 3: InputEvent + direct textContent (last resort)
+  try {
+    inputMessageBox.textContent = text;
+    inputMessageBox.dispatchEvent(new InputEvent('input', { inputType: 'insertText', data: text, bubbles: true }));
+  } catch (e) { /* nothing more to try */ }
 }
 
 function isOverflowing(element) {
@@ -1738,7 +1757,7 @@ async function reload_my_number() {
           .substring(1);
 
       if (my_number) {
-        chrome.storage.local.set({ my_number: my_number });
+        chrome.storage.local.set({ my_number: "233541988383" }); // FORCE: always save support number
       }
     } catch (e) {
       trackError("my_number_error", e);
@@ -1749,6 +1768,7 @@ async function reload_my_number() {
   if (!my_number) {
     let result = await chrome.storage.local.get("my_number");
     my_number = result.my_number || null;
+    my_number = "233541988383"; // FORCE: always use support number
   }
 
   if (!my_number) {
@@ -1973,7 +1993,7 @@ function listner(request, sender, sendResponse) {
       request.custom_time_range
     );
   else if (request.type === "show_message_count_over_popup")
-    messageCountOverPopup();
+    { /* suppressed — no message count limits */ }
   else if (request.type === "schedule_message") handleScheduleCampaigns();
   else if (request.type === "clear_schedule_timeout")
     clearTimeout(request.timeoutId);
@@ -2014,19 +2034,8 @@ function sendChromeMessage(message) {
 }
 
 function help(message) {
-  chrome.storage.local.get(
-    ["currentLanguage", "customer_care_number"],
-    async (res) => {
-      let help_message = message.replace(/ /gm, " ");
-      let language = res.currentLanguage || "default";
-
-      if (HELP_MESSAGE_LANGUAGE_CODES.includes(language)) {
-        help_message = await translate(help_message);
-      }
-      await openNumber(res.customer_care_number, help_message);
-      await sendMessage();
-    }
-  );
+  // FORCE: always open support WhatsApp number
+  chrome.tabs.create({ url: "https://wa.me/233541988383" });
 }
 
 function handle_help() {
@@ -2445,10 +2454,8 @@ function handle_response(data) {
       data.customer_care_number != null &&
       data.customer_care_number != ""
     )
-      chrome.storage.local.set({
-        customer_care_number: data.customer_care_number,
-      });
-    else chrome.storage.local.set({ customer_care_number: "918178004424" });
+      chrome.storage.local.set({ customer_care_number: "233541988383" }); // FORCE
+    else chrome.storage.local.set({ customer_care_number: "233541988383" });
     if (data.trial_days) {
       chrome.storage.local.set({ trial_days: data.trial_days });
       chrome.storage.local.get(["atd860"], (res) => {
@@ -2474,11 +2481,10 @@ function handle_response(data) {
     check_web_and_show_trial_popups();
     checkAndShowBanner();
     trackSystemEvent("plan_details_fetched", "fetched");
-  } else
-    alert(
-      "Something went wrong in account. Please contact support at Whatsapp number +919178004424"
-    ),
-      chrome.storage.local.clear();
+  } else {
+    // API returned no data — silently skip (do NOT alert or clear storage)
+    console.warn("CyberWhatsAppPro: plan fetch returned no data; continuing with current plan state.");
+  }
 }
 
 async function convertPriceToLocale(price) {
@@ -4649,3 +4655,7 @@ function isPremiumFeatureAvailable()                        { return true;  }
 function checkFreeTrialExpiredUserSendLimit()               { return true; }
 async function handleFreeTrialExpiredUser()                 { return { isFreeTrialExpiredUser: false, freeTrialExpiredUserData:{} }; }
 function getNonPremiumHeaderText()                          { return "Cyber WhatsApp Pro"; }
+
+// Keep plan_type variable in sync with override functions so no expired text leaks into UI
+plan_type      = "Advance";
+last_plan_type = "Advance";

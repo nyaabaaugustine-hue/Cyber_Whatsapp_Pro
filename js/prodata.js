@@ -545,11 +545,18 @@ let DOCUMENT_ELEMENT_SELECTORS = {
     "[data-testid=\"popup-controls-ok\"]",
         "[data-animate-modal-popup=\"true\"]:not(:has(svg circle)) button"
   ],
-  send_message_btn: ["span[data-icon=\"send\"]",
-        "span[data-icon=\"wds-ic-send-filled\"]",
+  send_message_btn: [
         "button[aria-label=\"Send\"]",
         "button[aria-label=\"Enviar\"]",
-        "button[aria-label=\"إرسال\"]"],
+        "button[aria-label=\"إرسال\"]",
+        "button[aria-label=\"Отправить\"]",
+        "button[aria-label=\"Envoyer\"]",
+        "span[data-icon=\"send\"]",
+        "span[data-icon=\"wds-ic-send-filled\"]",
+        "[data-testid=\"send\"] button",
+        "footer button[data-tab='11']",
+        "#main footer button:last-child"
+    ],
 };
 
 // Google Analytics Config Data
@@ -768,7 +775,7 @@ let FAQS = [
 let RUNTIME_CONFIG = {
   reloadInject: false,
   useOldInjectMethod: true,
-  useOldMessageSending: true,
+  useOldMessageSending: false,   // use PROS store API (more reliable); falls back to DOM method automatically
 };
 
 let FREE_TRIAL_LIMIT = {
