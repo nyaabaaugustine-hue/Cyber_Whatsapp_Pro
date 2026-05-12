@@ -1,4 +1,4 @@
-﻿importScripts("prodata.js");
+importScripts("prodata.js");
 importScripts("ga-code.js");
 
 let redirect_url = "https://cybergh.netlify.app";
@@ -118,10 +118,11 @@ const countryToCurrency = {
   IR: "IRR",
   IS: "ISK",
   IT: "EUR",
-  JE: "GBP",
   JM: "JMD",
-  JO: "JOD",
   JP: "JPY",
+  JE: "GBP",
+  JO: "JOD",
+  KZ: "KZT",
   KE: "KES",
   KG: "KGS",
   KH: "KHR",
@@ -132,7 +133,6 @@ const countryToCurrency = {
   KR: "KRW",
   KW: "KWD",
   KY: "KYD",
-  KZ: "KZT",
   LA: "LAK",
   LB: "LBP",
   LC: "XCD",
@@ -511,7 +511,6 @@ const countryToDialCode = {
 };
 
 chrome.runtime.onInstalled.addListener(async function (e) {
-  // pro_send_notification("Pro Sender is installed", "");
   fetchCountryInfoPro();
 
   chrome.storage.local.set({
@@ -531,20 +530,16 @@ chrome.runtime.onInstalled.addListener(async function (e) {
     unsubscribe_keyword: "STOP",
   });
 
-  // Check if there is an open WhatsApp Web tab
   chrome.tabs.query({ url: "*://web.whatsapp.com/*" }, function (tabs) {
     if (tabs.length > 0) {
-      // If WhatsApp Web is already open, activate that tab and reload it
       chrome.tabs.update(tabs[0].id, { active: true }, function () {
         chrome.tabs.reload(tabs[0].id);
       });
     } else {
-      // Else open a new WhatsApp Web tab
       chrome.tabs.create({ url: "https://web.whatsapp.com/" });
     }
   });
 
-  // Add bookmark
   chrome.bookmarks.search({ url: bookmark_url }, function (bookmarks) {
     if (bookmarks.length === 0) {
       chrome.bookmarks.create({
@@ -556,6 +551,13 @@ chrome.runtime.onInstalled.addListener(async function (e) {
   });
 
   GoogleAnalytics.trackEvent("extension_install");
+
+  // ── License: restore re-check alarm if already activated ──
+  chrome.storage.local.get("cwp_license", (result) => {
+    if (result.cwp_license?.premium) {
+      chrome.alarms.create("cwp_license_recheck", { periodInMinutes: 360 });
+    }
+  });
 });
 
 chrome.storage.session.setAccessLevel({
@@ -568,12 +570,10 @@ function messageListner() {
   chrome.runtime.onMessage.addListener(listner);
 }
 
-// Initialize background service worker
 function bgInit() {
   messageListner();
 }
 
-// Call initialization on startup
 bgInit();
 
 function listner(request, sender, sendResponse) {
@@ -595,21 +595,14 @@ function listner(request, sender, sendResponse) {
   if (request.type === "get_chrome_email") {
     try {
       if (chrome.identity && chrome.identity.getProfileUserInfo) {
-        // Try to get user info. Note: email is only returned if Sync is enabled.
         chrome.identity.getProfileUserInfo({ accountStatus: "ANY" }, function (userInfo) {
           if (chrome.runtime.lastError) {
-            console.log("Error fetching email:", chrome.runtime.lastError.message);
             sendResponse({ email: "" });
           } else if (userInfo && userInfo.email) {
             sendResponse({ email: userInfo.email });
           } else {
-            // Fallback for older versions or different sync states
             chrome.identity.getProfileUserInfo(function (userInfoOld) {
-              if (userInfoOld && userInfoOld.email) {
-                sendResponse({ email: userInfoOld.email });
-              } else {
-                sendResponse({ email: "" });
-              }
+              sendResponse({ email: userInfoOld?.email || "" });
             });
           }
         });
@@ -617,12 +610,68 @@ function listner(request, sender, sendResponse) {
         sendResponse({ email: "" });
       }
     } catch (e) {
-      console.log("Identity API not available or failed:", e);
       sendResponse({ email: "" });
     }
-    return true; // Keep channel open for async response
+    return true;
   }
 }
+
+// ── License: periodic re-check alarm ─────────────────────────
+const LICENSE_API_URL = "https://cwp-license-backend.vercel.app/api/verify-license";
+
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === "cwp_license_recheck") {
+    recheckLicenseBackground();
+  }
+});
+
+chrome.runtime.onStartup.addListener(() => {
+  chrome.storage.local.get("cwp_license", (result) => {
+    if (result.cwp_license?.premium) {
+      chrome.alarms.create("cwp_license_recheck", { periodInMinutes: 360 });
+    }
+  });
+});
+
+async function recheckLicenseBackground() {
+  chrome.storage.local.get("cwp_license", async (result) => {
+    const license = result.cwp_license;
+    if (!license?.key) return;
+
+    try {
+      const response = await fetch(LICENSE_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ licenseKey: license.key }),
+      });
+
+      if (!response.ok) return; // Network issue — keep existing status
+
+      const data = await response.json();
+
+      if (!data.valid) {
+        // Server says revoked — clear locally
+        chrome.storage.local.remove("cwp_license");
+        chrome.alarms.clear("cwp_license_recheck");
+      } else {
+        // Refresh stored data with latest from server
+        chrome.storage.local.set({
+          cwp_license: {
+            ...license,
+            plan:     data.plan,
+            expiry:   data.expiry,
+            lifetime: data.lifetime,
+            premium:  true,
+            verified: Date.now(),
+          },
+        });
+      }
+    } catch {
+      // Silently fail — keep premium if server unreachable
+    }
+  });
+}
+// ─────────────────────────────────────────────────────────────
 
 function pro_send_notification(title, message) {
   try {
@@ -645,53 +694,6 @@ function sendMessageToContent(message) {
 
 const default_country_code = "IN";
 
-// async function fetchCountryInfoPro() {
-//   let default_country_info = {
-//     name: "India",
-//     name_code: "IN",
-//     dial_code: "91",
-//     currency: "INR",
-//     default: true,
-//   };
-//   let default_location_info = {
-//     name: "international",
-//     name_code: "US",
-//     currency: "USD",
-//     default: true,
-//   };
-
-//   let current_country_info = await new Promise((resolve, reject) => {
-//     fetch("https://get.geojs.io/v1/ip/geo.json")
-//       .then((res) => res.json())
-//       .then((data) =>
-//         resolve({
-//           name: data.country,
-//           name_code: data.country_code,
-//           dial_code: countryToDialCode[data.country_code],
-//           currency: countryToCurrency[data.country_code],
-//           city: data.city,
-//           region: data.region,
-//           country: data.country,
-//           default: false,
-//         })
-//       )
-//       .catch(() => resolve(null));
-//   });
-
-//   if (current_country_info === null) {
-//     chrome.storage.local.set({
-//       country_info: default_country_info,
-//       location_info: default_location_info,
-//     });
-//   } else {
-//     chrome.storage.local.set({
-//       country_info: current_country_info,
-//       location_info: current_country_info,
-//     });
-//   }
-// }
-
-// Timezone to country mapping (most common timezone per country)
 const timezoneToCountry = {
   'Asia/Kolkata': 'IN',
   'America/New_York': 'US',
@@ -710,7 +712,6 @@ const timezoneToCountry = {
   'America/Sao_Paulo': 'BR',
 };
 
-// Get country from timezone as fallback
 function getCountryFromTimezone() {
   try {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -723,13 +724,10 @@ function getCountryFromTimezone() {
         source: 'timezone'
       };
     }
-  } catch (error) {
-    console.error('Error getting timezone:', error);
-  }
+  } catch (error) { }
   return null;
 }
 
-// Get country from browser locale as fallback
 function getCountryFromLocale() {
   try {
     const locale = (typeof navigator !== 'undefined' && (navigator.language || navigator.userLanguage)) || '';
@@ -744,17 +742,13 @@ function getCountryFromLocale() {
         };
       }
     }
-  } catch (error) {
-    console.error('Error getting locale:', error);
-  }
+  } catch (error) { }
   return null;
 }
 
-// Try multiple IP geolocation providers with timeout
 async function fetchFromProvider(url, parser, timeout = 3000) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeout);
-
   try {
     const response = await fetch(url, { signal: controller.signal });
     clearTimeout(timeoutId);
@@ -767,164 +761,73 @@ async function fetchFromProvider(url, parser, timeout = 3000) {
 }
 
 async function fetchCountryInfoPro() {
-  // Test build 
   if (default_country_code !== "IN") {
-    let default_country_name = Object.keys(COUNTRY_WITH_SPECIFIC_PRICING).includes(default_country_code) ? COUNTRY_WITH_SPECIFIC_PRICING[default_country_code] : 'international';
     let test_country_info = {
-      name: default_country_name,
+      name: default_country_code,
       name_code: default_country_code,
       dial_code: countryToDialCode[default_country_code],
       currency: countryToCurrency[default_country_code],
       default: true
     };
-    chrome.storage.local.set({
-      country_info: test_country_info,
-      location_info: test_country_info
-    });
+    chrome.storage.local.set({ country_info: test_country_info, location_info: test_country_info });
     return;
   }
 
-  // Default fallbacks
-  let default_country_info = {
-    name: 'India',
-    name_code: 'IN',
-    dial_code: '91',
-    currency: 'INR',
-    default: true
-  };
-  let default_location_info = {
-    name: 'international',
-    name_code: "US",
-    currency: "USD",
-    default: true
-  };
+  let default_country_info = { name: 'India', name_code: 'IN', dial_code: '91', currency: 'INR', default: true };
+  let default_location_info = { name: 'international', name_code: "US", currency: "USD", default: true };
 
-  // Try multiple geolocation providers in parallel
   const providers = [
     {
-      name: 'geojs',
-      fetch: () => fetchFromProvider(
-        'https://get.geojs.io/v1/ip/geo.json',
-        (data) => ({
-          name: data.country,
-          name_code: data.country_code,
-          dial_code: countryToDialCode[data.country_code],
-          currency: countryToCurrency[data.country_code],
-          city: data.city,
-          region: data.region,
-          country: data.country,
-          default: false,
-          source: 'geojs'
-        })
-      )
+      fetch: () => fetchFromProvider('https://get.geojs.io/v1/ip/geo.json', (data) => ({
+        name: data.country, name_code: data.country_code,
+        dial_code: countryToDialCode[data.country_code],
+        currency: countryToCurrency[data.country_code],
+        city: data.city, region: data.region, country: data.country,
+        default: false, source: 'geojs'
+      }))
     },
     {
-      name: 'ipwho',
-      fetch: () => fetchFromProvider(
-        'https://ipwho.is/',
-        (data) => ({
-          name: data.country,
-          name_code: data.country_code,
-          dial_code: countryToDialCode[data.country_code],
-          currency: countryToCurrency[data.country_code],
-          city: data.city,
-          region: data.region,
-          country: data.country,
-          default: false,
-          source: 'ipwho'
-        })
-      )
+      fetch: () => fetchFromProvider('https://ipwho.is/', (data) => ({
+        name: data.country, name_code: data.country_code,
+        dial_code: countryToDialCode[data.country_code],
+        currency: countryToCurrency[data.country_code],
+        city: data.city, region: data.region, country: data.country,
+        default: false, source: 'ipwho'
+      }))
     },
-    {
-      name: 'ipinfo',
-      fetch: () => fetchFromProvider(
-        'https://ipinfo.io/json',
-        (data) => ({
-          name: data.country,
-          name_code: data.country,
-          dial_code: countryToDialCode[data.country],
-          currency: countryToCurrency[data.country],
-          city: data.city,
-          region: data.region,
-          country: data.country,
-          default: false,
-          source: 'ipinfo'
-        })
-      )
-    }
   ];
 
-  // Try all providers in parallel and use the first successful one
   let current_country_info = null;
   try {
     const results = await Promise.allSettled(providers.map(p => p.fetch()));
     for (const result of results) {
-      if (result.status === 'fulfilled' && result.value && result.value.name_code) {
+      if (result.status === 'fulfilled' && result.value?.name_code) {
         current_country_info = result.value;
         break;
       }
     }
-  } catch (error) {
-    console.error('Error fetching from providers:', error);
-  }
+  } catch (error) { }
 
-  // Fallback 1: Try timezone-based detection
   if (!current_country_info) {
     const timezoneInfo = getCountryFromTimezone();
     if (timezoneInfo) {
-      current_country_info = {
-        name: countryWithSpecificPricing[timezoneInfo.name_code] || 'international',
-        name_code: timezoneInfo.name_code,
-        dial_code: timezoneInfo.dial_code,
-        currency: timezoneInfo.currency,
-        default: false,
-        source: 'timezone'
-      };
+      current_country_info = { name_code: timezoneInfo.name_code, dial_code: timezoneInfo.dial_code, currency: timezoneInfo.currency, default: false, source: 'timezone' };
     }
   }
 
-  // Fallback 2: Try locale-based detection
   if (!current_country_info) {
     const localeInfo = getCountryFromLocale();
     if (localeInfo) {
-      current_country_info = {
-        name: countryWithSpecificPricing[localeInfo.name_code] || 'international',
-        name_code: localeInfo.name_code,
-        dial_code: localeInfo.dial_code,
-        currency: localeInfo.currency,
-        default: false,
-        source: 'locale'
-      };
+      current_country_info = { name_code: localeInfo.name_code, dial_code: localeInfo.dial_code, currency: localeInfo.currency, default: false, source: 'locale' };
     }
   }
 
-  // Track the detection method
-  if (current_country_info) {
-    GoogleAnalytics.trackEvent('country_detection_success', {
-      source: current_country_info.source,
-      country: current_country_info.name_code
-    });
-  } else {
-    GoogleAnalytics.trackEvent('country_detection_failed', {
-      fallback: 'default'
-    });
-  }
-
-  // country_info: used in popup js for country code selector
-  // location_info: used in content js for country wise pricing 
   if (current_country_info === null) {
-    chrome.storage.local.set({
-      country_info: default_country_info,
-      location_info: default_location_info
-    });
+    chrome.storage.local.set({ country_info: default_country_info, location_info: default_location_info });
   } else {
-    chrome.storage.local.set({
-      country_info: current_country_info,
-      location_info: current_country_info
-    });
+    chrome.storage.local.set({ country_info: current_country_info, location_info: current_country_info });
   }
 }
-
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   try {
@@ -935,9 +838,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         });
       }
     }
-  } catch (error) {
-    console.error("Error getting tab info:", error);
-  }
+  } catch (error) { }
 });
 
 function hasAnHourPassed(lastTime) {
@@ -949,10 +850,6 @@ function getCurrentTime() {
   return new Date().getTime();
 }
 
-// Show "show_update_reminder_popup" Popup on update available
 chrome.runtime.onUpdateAvailable.addListener((details) => {
   console.log("Update available:", details.version);
-  // sendMessageToContent({ type: 'show_update_reminder_popup' });
 });
-
-

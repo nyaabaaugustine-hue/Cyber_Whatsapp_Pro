@@ -1,4 +1,4 @@
-﻿{
+{
   "manifest_version": 3,
   "update_url": "https://clients2.google.com/service/update2/crx",
   "name": "Cyber WhatsApp Pro",
@@ -63,9 +63,11 @@
     "unlimitedStorage",
     "tabs",
     "identity",
-    "notifications"
+    "notifications",
+    "alarms"
   ],
   "host_permissions": [
-    "*://web.whatsapp.com/*"
+    "*://web.whatsapp.com/*",
+    "https://cwp-license-backend.vercel.app/*"
   ]
 }
